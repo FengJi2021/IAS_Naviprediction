@@ -1,0 +1,4 @@
+torch
+torchvision
+opencv-contrib-python
+scikit-learn
