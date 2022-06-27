@@ -9,6 +9,20 @@
           </mappings>
         </serverdata>
       </paths>
+      <paths name="amer@ml:22 key (1)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/amer/tmp/pycharm_project_IAS_Naviprediction" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="amer@ml:22 key (3)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/amer/tmp/pycharm_project_IAS_Naviprediction" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
     </serverData>
     <option name="myAutoUpload" value="ALWAYS" />
   </component>
