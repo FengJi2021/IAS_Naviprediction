@@ -27,6 +27,10 @@ threadpoolctl = "==3.1.0"
 tifffile = "==2022.5.4"
 traceback2 = "==1.4.0"
 unittest2 = "==1.1.0"
+wandb = "*"
+torch = "*"
+torchvision = "*"
+tqdm = "*"
 
 [dev-packages]
 black = {extras = ["d"], version = "*"}
