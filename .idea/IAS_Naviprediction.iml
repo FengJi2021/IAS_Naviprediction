@@ -7,4 +7,7 @@
     <orderEntry type="jdk" jdkName="Remote Python 3.9.13 (sftp://amer@ml:22/home/amer/.pyenv/shims/python)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
+  <component name="PyDocumentationSettings">
+    <option name="renderExternalDocumentation" value="true" />
+  </component>
 </module>
