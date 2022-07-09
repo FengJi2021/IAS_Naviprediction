@@ -39,9 +39,17 @@ the arguments are as follows:
 - --dest_path: path of the output folder.
 - --folders_path: if each maps and associated yaml file are stored in a folder and separated from other files, you can use this argument. this way all folders will be loaded automatically and complexity metrics will be calculated.
   - if this argument is used, other arguments must not be specified
+
 the name of yaml file must be map.yaml, if your file has another name, please rename it to map.yaml
+### Example:
+```bash
+python world_complexity.py --image_path /path/to/folder/of/images --yaml_path path/to/map.yaml --dest_path path/to/output/folder
+```
+or 
+```bash
+python world_complexity.py --folders_path /path/to/folders/of/maps
+```
 ### Step 1
-in order to calculate the metrics of worlds, script world.complexity.py should be executed. the arguments are as follows:
 1. Install [world_complexity.py](https://github.com/ignc-research/arena-evaluation/blob/main/static-world-complexity/world_complexity.py) script
 
 ### Step 2
