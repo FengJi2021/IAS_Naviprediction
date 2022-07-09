@@ -1,10 +1,41 @@
 # IAS NaviPrediction
 
 TODO: This seems to a dated readme. It should be updated.
+## Date augmentation with GAN (Generative adversarial networks)
+A deep learning approach was used to complement the data set. for this approach the method Generative adversarial networks was chosen. to use the script, the file `gan.py` should be executed. 
+The arguments are as follows:
+- --image_path: path of dataset.
+  - for generating the maps, there is in the folder data_augmentation_GAN, a folder with dataset. you can use this as a dataset or use your own maps in .png format. all maps (images) should be in one folder.
+- --output_path: path of the output folder.
+### Example:
+```bash
+python data_augmentation_GAN/gan.py --image_path /path/to/dataset --output_path /path/to/output
+```
+## Filter of maps
+Second step is to filter the generated maps. to filter the maps, the script `filter.py` should be used. 
+The arguments are as follows:
+- --image_path: path of generated images.
+- --output_path: path of the output folder.
+### Example:
+```bash
+python data_augmentation_GAN/filter.py --image_path /path/to/generated_images --output_path /path/to/output
+```
 
+## Create yaml file
+For the world complexity metrics, the maps should still have yaml files. 
+to create yaml files, you should run the script `create_yaml.py`.
+he arguments are as follows:
+- --image_path: path of images.
+### Example:
+```bash
+python create_yaml.py --image_path /path/to/folder/of/images
+```
 ## World complexity
 
+in order to calculate the metrics of worlds, script `world.complexity.py` should be executed. the arguments are as follows:
+the name of yaml file must be map.yaml, if your file has another name, please rename it to map.yaml
 ### Step 1
+in order to calculate the metrics of worlds, script world.complexity.py should be executed. the arguments are as follows:
 1. Install [world_complexity.py](https://github.com/ignc-research/arena-evaluation/blob/main/static-world-complexity/world_complexity.py) script
 
 ### Step 2

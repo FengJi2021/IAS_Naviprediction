@@ -20,15 +20,7 @@ class Filter:
             if not output == None:
                 output_path = os.path.join(output, fileBase)
                 cv2.imwrite(output_path, out_binary)
-                print(fileBase)
-                print(
-                    "----------------------------------------------------------------------------------"
-                )
-            else:
-                path = os.path.join(input, "/output")
-                output_path = os.mkdir(path)
-                cv2.imwrite(output_path, out_binary)
-                print(fileBase)
+                print('filterd file:', fileBase)
                 print(
                     "----------------------------------------------------------------------------------"
                 )
@@ -50,7 +42,7 @@ def main():
         action="store",
         dest="output_path",
         help="output path where the generated images should be stored.",
-        required=False,
+        required=True,
     )
 
     args = parser.parse_args()
@@ -61,3 +53,9 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+#Arguments example
+# --image_path
+# /home/nilou/Schreibtisch/git/IAS_Naviprediction/data_augmentation_GAN/output
+# --output_path
+# /home/nilou/Schreibtisch/git/IAS_Naviprediction/data_augmentation_GAN/output/filtered

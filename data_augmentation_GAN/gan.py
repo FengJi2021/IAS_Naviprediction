@@ -171,7 +171,7 @@ class Gan:
             if (epoch + 1) % 15 == 0:
                 checkpoint.save(file_prefix=checkpoint_prefix)
 
-            print(f"Time for epoch {epoch + 1} is {time.time()-start}")
+            print(f"Generating time for map {epoch + 1} is {time.time()-start}")
 
         display.clear_output(wait=True)
         self.save_output(generatorModel, epochs, seed,output)
@@ -189,7 +189,7 @@ class Gan:
             plt.axis("off")
         path = os.path.join(
             output,
-            f"image_at_epoch_{epoch}.png",
+            f"map_{epoch}.png",
         )
         plt.savefig(path)
         # plt.show()
@@ -200,10 +200,10 @@ def main():
     parser = ArgumentParser()
     parser.add_argument("--image_path", action="store", dest="image_path", default=None,
                         help="path to the floor plan of your world. Usually in .png format",
-                        required=False)
+                        required=True)
     parser.add_argument("--output_path", action="store", dest="output_path", default=None,
                         help="location to store the generated images.",
-                        required=False)
+                        required=True)
     args = parser.parse_args()
 
     images = []
@@ -275,3 +275,9 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+#Argument example
+# --image_path
+# /home/nilou/Schreibtisch/generated_maps/images
+# --output_path
+# /home/nilou/Schreibtisch/git/IAS_Naviprediction/data_augmentation_GAN/example/output

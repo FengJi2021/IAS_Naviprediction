@@ -18,14 +18,6 @@ class Distance:
 
 
 	def pixelVal(self, pix, r1, s1, r2, s2):
-		'''
-		contrast stretching Function to map each intensity level to output intensity level.
-		:param r1:
-		:param s1:
-		:param r2:
-		:param s2:
-		:return:
-		'''
 
 		if (0 <= pix and pix <= r1):
 			return (s1 / r1) * pix
@@ -59,13 +51,14 @@ class Distance:
 		threshold_upper = 220
 		edged = cv2.Canny(gray_blurred, threshold_lower, threshold_upper)
 		#cv2.imshow('edged',edged)
-		cv2.waitKey(0)
+
 
 		(cnt, hierarchy) = cv2.findContours(edged, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 
 		rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-		cv2.drawContours(rgb, cnt, -1, (0, 255, 0), 2)
-		#cv2.imshow('map5', rgb)
+		# cv2.drawContours(rgb, cnt, -1, (0, 255, 0), 2)
+		# cv2.imshow('map5', rgb)
+		#cv2.waitKey(0)
 
 		return cnt , img
 
@@ -76,8 +69,14 @@ class Distance:
 
 		cnts , image = self.find_Contours(path)
 		normDist, var , minimum, average= self.find_boxes(cnts, width, image)
-		normDist = float("{0:.1f}".format(normDist))
-		var = float("{0:.5f}".format(var))
+		if not normDist==None:
+			normDist = float("{0:.1f}".format(normDist))
+		else:
+			normDist = []
+		if not var==None:
+			var = float("{0:.5f}".format(var))
+		else:
+			var=[]
 		return normDist, var, minimum, average
 
 
@@ -150,27 +149,42 @@ class Distance:
 					# cv2.imshow('image', imS)
 					# cv2.waitKey(20000)
 					temp.append(DistanceCm)
-
-			print('minimum', np.min([value for value in temp if value!=0]))
-
-			mean.append(np.mean([value for value in temp if value!=0]))
-			minimum.append(np.min([value for value in temp if value!=0]))
+			arrayTemp = np.array(temp)
+			is_all_zero = np.all((arrayTemp == 0))
+			if not is_all_zero:
+				print('minimum', np.min([value for value in temp if value!=0]))
+				mean.append(np.mean([value for value in temp if value!=0]))
+				minimum.append(np.min([value for value in temp if value!=0]))
+			else:
+				mean= None
+				minimum = None
 			dif.append(np.diff(temp))
 			countRef += 1
-		print('mean²', np.mean(mean))
-		print('variance', np.var(mean))
-		print('min²', np.min(minimum))
-		x = []
-		for i in mean:
-			if i <= np.mean(mean) :
-				x.append(x)
-		print('length of mean', len(mean))
-		print('number of points less than mean', len(x))
-		print('normalized value of distance', len(x)/len(mean))
-		normDist= len(x)/len(mean)
-		var = np.var(mean)
+		if not mean== None:
+			print('mean²', np.mean(mean))
+			print('variance', np.var(mean))
+			x = []
+			for i in mean:
+				if i <= np.mean(mean) :
+					x.append(x)
+			print('length of mean', len(mean))
+			print('number of points less than mean', len(x))
+			print('normalized value of distance', len(x)/len(mean))
+			normDist= len(x)/len(mean)
+			var = np.var(mean)
+			average = float("{:.1f}".format(np.mean(mean)))
+		else:
+			average = None
+			var = None
+			normDist = None
+		if not minimum==None:
+			min = np.min(minimum)
+			print('min²', np.min(minimum))
+		else:
+			min = None
 
-		return normDist, var, np.min(minimum), float("{:.1f}".format(np.mean(mean)))
+
+		return normDist, var, min, average
 
 
 

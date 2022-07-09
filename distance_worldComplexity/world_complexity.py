@@ -3,7 +3,7 @@ import cv2, imutils
 import sys
 import yaml
 import os
-import rospkg
+#import rospkg
 import numpy as np
 from argparse import ArgumentParser
 from collections import Counter
@@ -14,6 +14,7 @@ from collections import namedtuple
 from distance_between import Distance
 from PIL import Image
 from unittest import skip
+import glob
 
 # TODO s
 # - die angle liste soll man trennen, weil gerade in einer liste gespeichert werden und ich weiß nicht, welche in welche
@@ -408,34 +409,73 @@ if __name__ == '__main__':
     parser.add_argument("--dest_path", action="store", dest="dest_path",
                         help="location to store the complexity data about your map",
                         required=False)
+    parser.add_argument("--folders_path", action="store", dest="folders_path",
+                        help="path of maps folders (all maps and yaml fiels are in separate folders)",
+                        required=False)
+
     args = parser.parse_args()
     converted_dict = vars(args)
     file_name = Path(converted_dict['image_path']).stem
 
    # normDistance, variance = Distance().image_feat(args.image_path, 0.3)
     #extract data
-    img_origin, img, map_info = Complexity().extract_data(
-        args.image_path, args.yaml_path)
+    if args.folders_path:
 
-    data = {}
-    list_of_all_angles = []
-    _, _, num = Complexity().no_obstacles(args.image_path)
+        dirs = [x[0] for x in os.walk(args.folders_path)][1:]
+        for dir in dirs:
+            folders = [x[2] for x in os.walk(dir)]
+            png = [s for s in folders[0] if ".png" in s]
+            yml = [s for s in folders[0] if "map.yaml" in s]
+            image_path = dir + '/{}'.format(png[0])
+            yaml_path = dir + '/{}'.format(yml[0])
+            dest_path = dir
 
-    # calculating metrics
-    data["Entropy"], data["MaxEntropy"] = Complexity().entropy(img)
-    data['MapSize'] = Complexity().determine_map_size(img, map_info)
-    data["OccupancyRatio"] = Complexity().occupancy_ratio(img)
-   # data["NumObs_pixels"] = Complexity().number_of_static_obs(img)
-    data["NumObs_Cv2"] = num
-    #data["MinObsDis"] = Complexity().distance_between_obs()
-    data["AngleInfo"] = Complexity().processing_angle_information()
-    data['distance(normalized)'] , data['distance.variance'], _ ,  data['distance.avg']=  Distance().image_feat(args.image_path, 0.3)
+            img_origin, img, map_info = Complexity().extract_data(
+               image_path, yaml_path)
 
-    # dump results
-    Complexity().save_information(data, args.dest_path)
+            data = {}
+            list_of_all_angles = []
+            _, _, num = Complexity().no_obstacles(image_path)
 
-    print(data)
+            # calculating metrics
+            data["Entropy"], data["MaxEntropy"] = Complexity().entropy(img)
+            data['MapSize'] = Complexity().determine_map_size(img, map_info)
+            data["OccupancyRatio"] = Complexity().occupancy_ratio(img)
+            #data["NumObs_pixels"] = Complexity().number_of_static_obs(img)
+            data["NumObs_Cv2"] = num
+            #data["MinObsDis"] = Complexity().distance_between_obs()
+            data["AngleInfo"] = Complexity().processing_angle_information()
+            data['distance(normalized)'] , data['distance.variance'], _ ,  data['distance.avg']=  Distance().image_feat(image_path, 0.3)
 
+            # dump results
+            Complexity().save_information(data, dest_path)
+
+            print(data)
+
+    else:
+
+
+        img_origin, img, map_info = Complexity().extract_data(
+           args.image_path, args.yaml_path)
+
+        data = {}
+        list_of_all_angles = []
+        _, _, num = Complexity().no_obstacles(args.image_path)
+
+        # calculating metrics
+        data["Entropy"], data["MaxEntropy"] = Complexity().entropy(img)
+        data['MapSize'] = Complexity().determine_map_size(img, map_info)
+        data["OccupancyRatio"] = Complexity().occupancy_ratio(img)
+        #data["NumObs_pixels"] = Complexity().number_of_static_obs(img)
+        data["NumObs_Cv2"] = num
+        #data["MinObsDis"] = Complexity().distance_between_obs()
+        data["AngleInfo"] = Complexity().processing_angle_information()
+        data['distance(normalized)'] , data['distance.variance'], _ ,  data['distance.avg']=  Distance().image_feat(args.image_path, 0.3)
+
+        # dump results
+        Complexity().save_information(data, args.dest_path)
+
+        print(data)
 
 # NOTE: for our complexity measure we make some assumptions
 # 1. We ignore the occupancy threshold. Every pixel > 0 is considert to be fully populated even though this is not entirely accurate since might also only partially be populated (we therefore slightly overestimate populacy.)
