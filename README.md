@@ -32,7 +32,13 @@ python create_yaml.py --image_path /path/to/folder/of/images
 ```
 ## World complexity
 
-in order to calculate the metrics of worlds, script `world.complexity.py` should be executed. the arguments are as follows:
+in order to calculate the metrics of worlds, script `world.complexity.py` should be executed. 
+the arguments are as follows:
+- --image_path: path of the image.
+- --yaml_path: path of the map.yaml file.
+- --dest_path: path of the output folder.
+- --folders_path: if each maps and associated yaml file are stored in a folder and separated from other files, you can use this argument. this way all folders will be loaded automatically and complexity metrics will be calculated.
+  - if this argument is used, other arguments must not be specified
 the name of yaml file must be map.yaml, if your file has another name, please rename it to map.yaml
 ### Step 1
 in order to calculate the metrics of worlds, script world.complexity.py should be executed. the arguments are as follows:
