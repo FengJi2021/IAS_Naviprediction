@@ -1,18 +1,12 @@
-import numpy as np
+
 import cv2
-from matplotlib import pyplot as plt
-from skimage.restoration import denoise_tv_chambolle
 import glob
 import os
-import itertools
-
-
-path = "/home/nilou/Schreibtisch/geno/research/222702_planets/image2/*.png"
-inputs = glob.glob(path)
+from argparse import ArgumentParser
 
 
 class Filter:
-    def filterImages(self, input, output):
+    def filterImages(self, inputs, output):
 
         for image in inputs:
             fileBase = os.path.basename(image)
@@ -42,7 +36,7 @@ class Filter:
 
 def main():
 
-    parser = Gooey(ArgumentParser())
+    parser = ArgumentParser()
     parser.add_argument(
         "--image_path",
         action="store",
@@ -60,7 +54,10 @@ def main():
     )
 
     args = parser.parse_args()
-    Filter().filterImages(args.image_path, args.output_path)
+   # path = args.image_path
+    path = os.path.join(args.image_path, '*.png')
+    inputs = glob.glob(path)
+    Filter().filterImages(inputs, args.output_path)
 
 if __name__ == "__main__":
     main()
