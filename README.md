@@ -30,6 +30,15 @@ he arguments are as follows:
 ```bash
 python create_yaml.py --image_path /path/to/folder/of/images
 ```
+## calc_ComplexityValues.py
+
+This script calculates the complexity values of the given maps in a folder and writes them into a csv-file as input for the DNN.
+
+### Example:
+```bash
+python3 calc_ComplexityValues.py /home/valentin/AA/generated_maps
+```
+
 ## World complexity
 
 in order to calculate the metrics of worlds, script `world.complexity.py` should be executed. 
