@@ -36,7 +36,7 @@ This script calculates the complexity values of the given maps in a folder and w
 
 ### Example:
 ```bash
-python3 calc_ComplexityValues.py /home/valentin/AA/generated_maps
+python3 calc_ComplexityValues.py folderpath
 ```
 
 ## World complexity
