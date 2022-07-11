@@ -39,6 +39,8 @@ def saveAsPGM(mapsPath):
 
 def write2File(filepath, mapdata):
     file = open(filepath, 'w')
+    file.truncate(0)
+    file.write('World, EntropyRatio, MapSize, OccupancyRatio, NumObs_Cv2, AngleInfo_mean, distance_norm, distance_var, distance_avg\n')
 
     for element in mapdata:
         file.write(element)
@@ -48,15 +50,15 @@ def write2File(filepath, mapdata):
 
 if __name__ == '__main__':
 
-    mapsPath = '/home/valentin/AA/generated_maps'
+    #mapsPath = '/home/valentin/AA/generated_maps'
+    mapsPath = sys.argv[1]
     print(mapsPath)
     listPGM, listYAML = saveAsPGM(mapsPath)
     mapdata = []
 
     for i in range(0, len(listPGM)):
-        print(os.path.dirname(listPGM[i]))
         data = world_complexity.main(listPGM[i], listYAML[i], os.path.dirname(listPGM[i]))
-        mapdata.append(str(data))
+        mapdata.append(data)
     print('calculated values!')
     csvPath = mapsPath + '/map_worldcomplexity_results.csv'
     write2File(csvPath, mapdata)

@@ -1,5 +1,5 @@
 import math
-import cv2
+import cv2, imutils
 import sys
 import yaml
 import os
@@ -11,6 +11,8 @@ from scipy import spatial
 from pathlib import Path
 from matplotlib import pyplot as plt
 from collections import namedtuple
+from distance_between import Distance
+from PIL import Image
 from unittest import skip
 
 # TODO s
@@ -32,7 +34,7 @@ class Complexity:
     def extract_data(self, img_path: str, yaml_path: str):
 
         # reading in the image and converting to 0 = occupied, 1 = not occupied
-        if img_path[-3:] == 'pgm' or img_path[-3:] == 'jpg':
+        if img_path[-3:] == 'pgm' or img_path[-3:] == 'jpg' or img_path[-3:] == 'png':
             img_origin = cv2.imread(img_path)
             img = cv2.cvtColor(img_origin, cv2.COLOR_BGR2GRAY)
             # convert image pixels to binary pixels 0 or 255
@@ -48,7 +50,7 @@ class Complexity:
         x_high_lim = max(t[0])
         y_low_lim = min(t[1])
         y_high_lim = max(t[1])
-        print(x_low_lim, x_high_lim)
+
         test = img[x_low_lim:x_high_lim, y_low_lim:y_high_lim]
         # cv2.imshow('test',test)
         # cv2.waitKey(0)
@@ -74,8 +76,14 @@ class Complexity:
     def entropy(self, img_gray):
         """ Measures the amount of disorder of in the image (between the obstacles). Proposed here: Performance Measure For The Evaluation of Mobile Robot Autonomy
         """
-        features = []
-        th, dst = cv2.threshold(img_gray, 0, 255, cv2.THRESH_BINARY)
+        new_img = self.gray_bg_square(img_gray)
+        # cv2.imshow('map_gray', img_gray)
+        # print(img_gray)
+        # cv2.imshow('new_img', new_img)
+        # print(new_img)
+        # cv2.waitKey()
+        #print()
+        th, dst = cv2.threshold(new_img, 0, 255, cv2.THRESH_BINARY)
         windows = self.sliding_window(dst, 2, (2, 2))
         windowList = []
         for window in windows:
@@ -117,6 +125,29 @@ class Complexity:
 
         return self.density_gird
 
+
+    def gray_bg_square(self, img):
+    #"return a white-background-color image having the img in exact center"
+
+        old_image_height, old_image_width = img.shape
+
+        # create new image of desired size and color (blue) for padding
+        image = cv2.copyMakeBorder(img, 500- int(img.shape[0]/2), 500- int(img.shape[0]/2) ,
+                                   500- int(img.shape[1]/2), 500- int(img.shape[1]/2), cv2.BORDER_REPLICATE)
+        # new_image_width = 1000
+        # new_image_height = 1000
+        # color = (205,205,205)
+        # result = np.full((new_image_height,new_image_width, 3), color, dtype=np.uint8)
+        #
+        # # compute center offset
+        # x_center = (new_image_width - old_image_width) // 2
+        # y_center = (new_image_height - old_image_height) // 2
+        #
+        # # copy img image into center of result image
+        # result[y_center:y_center+old_image_height, x_center:x_center+old_image_width] = img
+        # view result
+        return image
+
     def check_surrounding(self, img, i, j, obs_coordinates):
         """Determining all pixels that are occupied by this obstacle
         args:
@@ -132,11 +163,12 @@ class Complexity:
         # marking the pixel and setting it to not occupied to avoid double assignment
         obs_coordinates.append((i, j))
         img[i, j] = 205
+        
 
         # for every point we check in a star pattern, whether the surrounding cells are occupied also
         if i+1 < img.shape[0]:
             if j+1 < img.shape[1]:
-
+            
                 if img[i-1][j] == 0 and i >= 1:
                     self.check_surrounding(img, i-1, j, obs_coordinates)
                 if img[i+1][j] == 0 and i+1 <= img.shape[0]:
@@ -174,6 +206,7 @@ class Complexity:
                         obs_list[obs_num] = temp
                         obs_num += 1
 
+        print('obs_list', len(obs_list))
         return len(obs_list)
 
     def distance_between_obs(self, map_info):
@@ -214,19 +247,9 @@ class Complexity:
         areaList = []
         xcoordinate_center = []
         ycoordinate_center = []
-        image = cv2.imread(path)
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        (thresh, blackAndWhiteImage) = cv2.threshold(gray, 127, 255,
-                                                     cv2.THRESH_BINARY)
-        blur = cv2.GaussianBlur(gray, (11, 11), 0)
-        canny = cv2.Canny(blur, 30, 40, 3)
-        dilated = cv2.dilate(canny, (5, 5), iterations=0)
+        print('no_obstacles: ' + str(path))
+        cnt , image = Distance().find_Contours(path)
 
-        (cnt, hierarchy) = cv2.findContours(
-            dilated.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        cv2.drawContours(rgb, cnt, -1, (0, 255, 0), 2)
-        # cv2.imshow('map5', rgb)
         print("No of circles: ", len(cnt))
         for c in cnt:
             if cv2.contourArea(c) > 1:
@@ -241,23 +264,18 @@ class Complexity:
                 coordList = [area, length, xcoord, ycoord]
         self.world_angles(xcoordinate_center, ycoordinate_center, list_of_all_angles)
 
-        # fig=plt.figure()
-        # ax=fig.add_subplot(1, 1, 1)
-        # ax.xaxis.set_ticks_position('top')
-        # ax.yaxis.grid(linestyle = '-', color = 'gray')
-        # ax.invert_yaxis()
-        # ax.plot(xcoordinate_center, ycoordinate_center, 'ro', linewidth = 1.5)
-        # # V this adds the lines V
-        # for x, y in zip(xcoordinate_center, ycoordinate_center):
-        #     plt.plot([0, x], [0, y], color = "blue")
-        #     # ^ this adds the lines ^
-        #     plt.plot(x, y, 0, 0, linestyle = '--')
+        cv2.waitKey(500)
+        return xcoordinate_center, ycoordinate_center, len(cnt)
 
-        # plt.show()
-        cv2.waitKey(10000)
-        print(
-            f'OBS nr: {len(xcoordinate_center)} \n xcoordinate_center {xcoordinate_center} \n ycoordinate_center: {ycoordinate_center}')
-        return xcoordinate_center, ycoordinate_center
+
+    def pixelVal(self, pix, r1, s1, r2, s2):
+
+        if (0 <= pix and pix <= r1):
+            return (s1 / r1) * pix
+        elif (r1 < pix and pix <= r2):
+            return ((s2 - s1) / (r2 - r1)) * (pix - r1) + s1
+        else:
+            return ((255 - s2) / (255 - r2)) * (pix - r2) + s2
 
     def world_angles(self, xCoord: list, yCoord: list, list_of_all_angles):
         """ calculates the angels between the obstacles in each window
@@ -283,9 +301,6 @@ class Complexity:
         xMax = max(xCoord)
         yMin = min(yCoord)
         yMax = max(yCoord)
-        # print(yMax)
-        # print(xCoord)
-        # print(yCoord)
 
         # because we want the point with smallest x and y, we should check if y is also the smallest
         if yCoord[xIndices[
@@ -316,13 +331,6 @@ class Complexity:
                         # calculate angle of all points in interval to the first x,y of interval
                         angle.append(self.get_angle(
                             [xInterval[0] + xCenter, yInterval[0] + yCenter], point))
-                      #  angle.append(self.get_angle([xInterval[0] + xCenter, yInterval[0] + yCenter], point))
-                        # print('point', point)
-                        # print('x interval', xInterval)
-                        # print('y Interval', yInterval)
-                        # print('center of Interval, ', [
-                        #   xInterval[0] + xCenter, yInterval[0] + yCenter])
-                        # print('angles to x-axis', angle)
 
                 if listLength == counter:  # when the y interval is over, window should go in x direction and then again in y direction, to find the new points
                     yInterval = [yInterval[1], yInterval[1]+10]
@@ -334,9 +342,9 @@ class Complexity:
                     sumAngles = sum(subAngleList)
                     lastAngle = 360 - sumAngles
                     subAngleList.append(lastAngle)
-                    # print('angles between every obstacle', subAngleList)
+
                     #global list_of_all_angles
-                    # list_of_all_angles.append([len(subAngleList)])
+
                     list_of_all_angles.append(subAngleList)
                     subAngleList = []
                     angle = []
@@ -360,7 +368,7 @@ class Complexity:
 
         return angle
 
-    def processing_angle_information(self, list_of_all_angles):
+    def processing_angle_information(self,  list_of_all_angles):
         """Evaluates the angle information of the obstacles, by taking in a list of all angles as input
         """
         #global list_of_all_angles
@@ -369,10 +377,10 @@ class Complexity:
         list_of_all_angles = [
             item for sublist in list_of_all_angles for item in sublist]  # flatten the list
         angle_data['mean'] = float(np.mean(list_of_all_angles))
-        angle_data['variance'] = float(np.var(list_of_all_angles))
-        if 0 not in [angle_data['mean'], angle_data['variance']]:
-            angle_data['adjusted_mean'] = float(
-                angle_data['mean'] / angle_data['variance'])
+       # angle_data['variance'] = float(np.var(list_of_all_angles))
+       # if 0 not in [angle_data['mean'], angle_data['variance']]:
+          #  angle_data['adjusted_mean'] = float(
+              #  angle_data['mean'] / angle_data['variance'])
 
         return angle_data
 
@@ -403,32 +411,40 @@ def main(imagePath, yamlPath, destPath):
     parser.add_argument("--dest_path", action="store", dest="dest_path",
                         help="location to store the complexity data about your map",
                         required=False)
-    args = parser.parse_args()
-    converted_dict = vars(args)
-    file_name = Path(converted_dict['image_path']).stem
+    #args = parser.parse_args()
+    #converted_dict = vars(args)
+    #file_name = Path(converted_dict['image_path']).stem
 
     # extract data
     img_origin, img, map_info = Complexity().extract_data(
         imagePath, yamlPath)
 
     data = {}
+    csvdata = []
     list_of_all_angles = []
-    Complexity().no_obstacles(imagePath, list_of_all_angles)
+    _, _, num = Complexity().no_obstacles(imagePath, list_of_all_angles)
 
     # calculating metrics
     data["Entropy"], data["MaxEntropy"] = Complexity().entropy(img)
     data['MapSize'] = Complexity().determine_map_size(img, map_info)
     data["OccupancyRatio"] = Complexity().occupancy_ratio(img)
-    data["NumObs"] = Complexity().number_of_static_obs(img, map_info)
-    data["MinObsDis"] = Complexity().distance_between_obs(map_info)
+    #data["NumObs"] = Complexity().number_of_static_obs(img, map_info)
+    #data["MinObsDis"] = Complexity().distance_between_obs(map_info)
+    data["NumObs_Cv2"] = num
     data["AngleInfo"] = Complexity().processing_angle_information(list_of_all_angles)
+    data['distance(normalized)'] , data['distance.variance'], _ ,  data['distance.avg']=  Distance().image_feat(imagePath, 0.3)
+    f_name = os.path.basename(imagePath).split('.')[0]
+
+    csv_str = str(f_name) + ',' + str(data["Entropy"] / data["MaxEntropy"]) + ',' + str(data['MapSize']) + ',' \
+              + str(data["OccupancyRatio"]) + ',' + str(num) + ',' + str(data["AngleInfo"]["mean"]) + ',' \
+              + str(data['distance(normalized)']) + ',' + str(data['distance.variance']) + ',' + str(data['distance.avg'])
 
     # dump results
     Complexity().save_information(data, destPath)
 
-    print(data)
+    print(csv_str)
 
-    return data
+    return csv_str
 
 
 if __name__ == '__main__':
