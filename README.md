@@ -1,6 +1,11 @@
 # IAS NaviPrediction
 
-TODO: This seems to a dated readme. It should be updated.
+
+## Pipeline Draft
+
+<img width="500" alt="Pipeline Draft" src="https://user-images.githubusercontent.com/13345/178496791-08fef751-091e-4b18-80bc-34d1ae494718.png">
+
+
 ## Date augmentation with GAN (Generative adversarial networks)
 A deep learning approach was used to complement the data set. for this approach the method Generative adversarial networks was chosen. to use the script, the file `gan.py` should be executed. 
 The arguments are as follows:
