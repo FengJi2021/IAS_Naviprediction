@@ -3,7 +3,7 @@
 
 ## Pipeline Draft
 
-<img width="500" alt="Pipeline Draft" src="https://user-images.githubusercontent.com/13345/178496791-08fef751-091e-4b18-80bc-34d1ae494718.png">
+<img width="500" alt="IAS_Naviprediction_v3 1" src="https://user-images.githubusercontent.com/13345/179000085-e8a09b9b-4030-4e63-9311-479b952fc3b4.png">
 
 
 ## Date augmentation with GAN (Generative adversarial networks)
