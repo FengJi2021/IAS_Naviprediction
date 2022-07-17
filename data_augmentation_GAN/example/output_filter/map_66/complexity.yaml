@@ -6,5 +6,5 @@ MaxEntropy: 2.321928094887362
 NumObs_Cv2: 22
 OccupancyRatio: 0.40102499999999996
 distance(normalized): 0.5
-distance.avg: 0.4
-distance.variance: 0.0058
+distance.avg: 0.0172
+distance.variance: 1.0e-05

@@ -5,6 +5,6 @@ MapSize: 80000.0
 MaxEntropy: 2.321928094887362
 NumObs_Cv2: 4
 OccupancyRatio: 0.1483375
-distance(normalized): []
-distance.avg: null
-distance.variance: []
+distance(normalized): 0.2
+distance.avg: 8.0e-05
+distance.variance: 0.0

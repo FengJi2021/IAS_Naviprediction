@@ -7,6 +7,7 @@ import numpy as np
 import imutils
 import cv2
 import math
+import ntpath
 
 class Distance:
 
@@ -58,7 +59,7 @@ class Distance:
 		rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 		# cv2.drawContours(rgb, cnt, -1, (0, 255, 0), 2)
 		# cv2.imshow('map5', rgb)
-		#cv2.waitKey(0)
+		# cv2.waitKey(0)
 
 		return cnt , img
 
@@ -66,9 +67,9 @@ class Distance:
 		'''
 		# load the image, convert it to grayscale, and blur it slightly
 		'''
-
+		head, tail = ntpath.split(path)
 		cnts , image = self.find_Contours(path)
-		normDist, var , minimum, average= self.find_boxes(cnts, width, image)
+		normDist, var , minimum, average= self.find_boxes(cnts, width, image, tail)
 		if not normDist==None:
 			normDist = float("{0:.1f}".format(normDist))
 		else:
@@ -80,7 +81,7 @@ class Distance:
 		return normDist, var, minimum, average
 
 
-	def find_boxes(self, cnts, width, image):
+	def find_boxes(self, cnts, width, image, tail):
 		'find bounding boxes of objects and calculates distances'
 		(cnts, _) = contours.sort_contours(cnts)
 		refD = None
@@ -99,12 +100,13 @@ class Distance:
 		for ref in boxesList:
 			temp=[]
 			print('------------------------------------------------------------------------------------------------')
+			print('file name:', tail)
 			print('reference Object:', countRef)
 			(tl, tr, br, bl) = ref
 			(tlblX, tlblY) = self.midpoint(tl, bl)
 			(trbrX, trbrY) = self.midpoint(tr, br)
 			D = dist.euclidean((tlblX, tlblY), (trbrX, trbrY))
-			#D = 2.54 * D * 10
+			D = 2.54 * D * 10
 			cX = np.average(ref[:, 0])
 			cY = np.average(ref[:, 1])
 			refObj = (ref, (cX, cY))
@@ -135,20 +137,21 @@ class Distance:
 
 					distNumpy = math.dist((refCoords[4][0], refCoords[4][1]), (objCoords[4][0], objCoords[4][1])) / refD
 					distNumpy = 2.54 * distNumpy
-					print('distNumpy:', distNumpy  )
+					print('distance with numpy: ', distNumpy  )
 					Distance= dist.euclidean((refCoords[4][0], refCoords[4][1]), (objCoords[4][0], objCoords[4][1])) / refD
 					DistanceCm = 2.54 * Distance
-					DistanceCm =  int( DistanceCm * 10**1) / 10.0**1
+					DistanceCm =  int( DistanceCm * 10**1) / 10.0**3
 					(mX, mY) = self.midpoint((refCoords[4][0], refCoords[4][1]), (objCoords[4][0], objCoords[4][1]))
 					cv2.putText(orig, str(DistanceCm), (int(mX), int(mY - 10)),
 								cv2.FONT_HERSHEY_SIMPLEX, 0.5, (240, 0, 159), 2)
 
-					print(str(DistanceCm), (int(mX), int(mY - 10)))
+					print('distance with scipy: ',str(DistanceCm))
+					#print('distance with scipy: ',str(DistanceCm), (int(mX), int(mY - 10)))
 					#print('DistanceCm', DistanceCm, (int(mX), int(mY - 10)))
 					# imS = cv2.resize(orig, (900, 900))
 					# cv2.imshow('image', imS)
 					# cv2.waitKey(20000)
-					temp.append(DistanceCm)
+					temp.append(distNumpy)
 			arrayTemp = np.array(temp)
 			is_all_zero = np.all((arrayTemp == 0))
 			if not is_all_zero:
@@ -172,7 +175,7 @@ class Distance:
 			print('normalized value of distance', len(x)/len(mean))
 			normDist= len(x)/len(mean)
 			var = np.var(mean)
-			average = float("{:.1f}".format(np.mean(mean)))
+			average = float("{:.5f}".format(np.mean(mean)))
 		else:
 			average = None
 			var = None
