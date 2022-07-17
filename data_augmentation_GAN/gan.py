@@ -1,8 +1,7 @@
-import os
+
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import numpy as np
-import PIL
 from tensorflow.keras import layers
 from IPython import display
 import time
@@ -150,7 +149,7 @@ class Gan:
         noise_dims,
         generator_optimizer,
         discriminator_optimizer,
-        output
+        output,
     ):
         for epoch in range(epochs):
             start = time.time()
@@ -166,7 +165,7 @@ class Gan:
                     discriminator_optimizer,
                 )
             display.clear_output(wait=True)
-            self.save_output(generatorModel, epoch + 1, seed,output)
+            self.save_output(generatorModel, epoch + 1, seed, output)
 
             if (epoch + 1) % 15 == 0:
                 checkpoint.save(file_prefix=checkpoint_prefix)
@@ -174,12 +173,12 @@ class Gan:
             print(f"Generating time for map {epoch + 1} is {time.time()-start}")
 
         display.clear_output(wait=True)
-        self.save_output(generatorModel, epochs, seed,output)
+        self.save_output(generatorModel, epochs, seed, output)
 
-    def save_output(self, model, epoch, test_input,output):
+    def save_output(self, model, epoch, test_input, output):
         predictions = model(test_input, training=False)
         # predictions = predictions.numpy().reshape(16,64,64,1)
-        fig = plt.figure(figsize=(4, 4))
+        fig = plt.figure(figsize=(1.5, 1.5))
         # print(predictions)
         for i in range(predictions.shape[0]):
             # plt.subplot(4,4,i+1)
@@ -187,10 +186,7 @@ class Gan:
                 (predictions[i] * 127.5 + 127.5).numpy().astype(np.uint8), cmap="gray"
             )
             plt.axis("off")
-        path = os.path.join(
-            output,
-            f"map_{epoch}.png",
-        )
+        path = os.path.join(output, f"map_{epoch}.png",)
         plt.savefig(path)
         # plt.show()
 
@@ -198,12 +194,22 @@ class Gan:
 def main():
 
     parser = ArgumentParser()
-    parser.add_argument("--image_path", action="store", dest="image_path", default=None,
-                        help="path to the floor plan of your world. Usually in .png format",
-                        required=True)
-    parser.add_argument("--output_path", action="store", dest="output_path", default=None,
-                        help="location to store the generated images.",
-                        required=True)
+    parser.add_argument(
+        "--image_path",
+        action="store",
+        dest="image_path",
+        default=None,
+        help="path to the floor plan of your world. Usually in .png format",
+        required=True,
+    )
+    parser.add_argument(
+        "--output_path",
+        action="store",
+        dest="output_path",
+        default=None,
+        help="location to store the generated images.",
+        required=True,
+    )
     args = parser.parse_args()
 
     images = []
@@ -263,7 +269,7 @@ def main():
         noise_dims,
         generator_optimizer,
         discriminator_optimizer,
-        args.output_path
+        args.output_path,
     )
 
     while True:
@@ -276,7 +282,7 @@ def main():
 if __name__ == "__main__":
     main()
 
-#Argument example
+# Argument example
 # --image_path
 # /home/nilou/Schreibtisch/generated_maps/images
 # --output_path

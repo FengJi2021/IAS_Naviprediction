@@ -1,4 +1,3 @@
-
 import cv2
 import glob
 import os
@@ -20,7 +19,7 @@ class Filter:
             if not output == None:
                 output_path = os.path.join(output, fileBase)
                 cv2.imwrite(output_path, out_binary)
-                print('filterd file:', fileBase)
+                print("filterd file:", fileBase)
                 print(
                     "----------------------------------------------------------------------------------"
                 )
@@ -46,15 +45,16 @@ def main():
     )
 
     args = parser.parse_args()
-   # path = args.image_path
-    path = os.path.join(args.image_path, '*.png')
+    # path = args.image_path
+    path = os.path.join(args.image_path, "*.png")
     inputs = glob.glob(path)
     Filter().filterImages(inputs, args.output_path)
+
 
 if __name__ == "__main__":
     main()
 
-#Arguments example
+# Arguments example
 # --image_path
 # /home/nilou/Schreibtisch/git/IAS_Naviprediction/data_augmentation_GAN/output
 # --output_path
