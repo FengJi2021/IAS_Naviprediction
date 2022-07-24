@@ -62,7 +62,7 @@ def main():
     args = parser.parse_args()
     path = os.path.join(args.image_path, "*.png")
     inputs = glob.glob(path)
-    res = 0.5
+    res = 0.2
     for img in inputs:
         head, tail = os.path.split(img)
         Create_yml().create_yaml_files(tail, head, res)

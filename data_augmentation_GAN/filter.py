@@ -1,8 +1,10 @@
+import time
+
 import cv2
 import glob
 import os
 from argparse import ArgumentParser
-
+from find_edge import edge
 
 class Filter:
     def filterImages(self, inputs, output):
@@ -45,11 +47,13 @@ def main():
     )
 
     args = parser.parse_args()
-    # path = args.image_path
     path = os.path.join(args.image_path, "*.png")
     inputs = glob.glob(path)
     Filter().filterImages(inputs, args.output_path)
-
+    print('--------------------------------------------------------------------------')
+    print('start removing unreachable areas')
+   # time.sleep(10)
+    edge(args.output_path)
 
 if __name__ == "__main__":
     main()

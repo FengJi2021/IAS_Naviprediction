@@ -76,7 +76,7 @@ class Gan:
         model = tf.keras.models.Sequential()
         model.add(
             layers.Conv2D(
-                128, (4, 4), strides=(2, 2), padding="same", input_shape=[128, 128, 3]
+                128, (5, 5), strides=(2, 2), padding="same", input_shape=[128, 128, 3]
             )
         )
         model.add(layers.LeakyReLU())
@@ -85,7 +85,11 @@ class Gan:
         model.add(layers.Conv2D(256, (4, 4), strides=(2, 2), padding="same"))
         model.add(layers.LeakyReLU())
         model.add(layers.Dropout(0.3))
-
+        model.add(
+            layers.Conv2D(
+                256, (5, 5), strides=(2, 2), padding="same"
+            )
+        )
         model.add(layers.Flatten())
         model.add(layers.Dense(1))
 
@@ -180,13 +184,19 @@ class Gan:
         # predictions = predictions.numpy().reshape(16,64,64,1)
         fig = plt.figure(figsize=(1.5, 1.5))
         # print(predictions)
+        plt.gca().set_axis_off()
+        plt.subplots_adjust(top = 1, bottom = 0, right = 1, left = 0,
+                    hspace = 1, wspace = 1)
+        # plt.margins(0,0)
+        # plt.gca().xaxis.set_major_locator(plt.NullLocator())
+        # plt.gca().yaxis.set_major_locator(plt.NullLocator())
         for i in range(predictions.shape[0]):
             # plt.subplot(4,4,i+1)
             plt.imshow(
                 (predictions[i] * 127.5 + 127.5).numpy().astype(np.uint8), cmap="gray"
             )
             plt.axis("off")
-        path = os.path.join(output, f"map_{epoch}.png",)
+        path = os.path.join(output, f"map_{epoch}.png")
         plt.savefig(path)
         # plt.show()
 
@@ -217,7 +227,7 @@ def main():
         images.append(i.path)
 
     images = tf.data.Dataset.from_tensor_slices(images)
-    BATCH_SIZE = 8
+    BATCH_SIZE = 5
     train_images = (
         images.map(Gan().getData, num_parallel_calls=tf.data.experimental.AUTOTUNE)
         .batch(BATCH_SIZE)
@@ -236,6 +246,10 @@ def main():
     print("----------------->", decision)
 
     crossEntropy = tf.keras.losses.BinaryCrossentropy(from_logits=True)
+   #  crossEntropy = tf.keras.losses.MeanSquaredError(
+   #  name='mean_squared_error'
+   #  )
+
 
     generator_optimizer = tf.keras.optimizers.Adam(1e-4)
     discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
