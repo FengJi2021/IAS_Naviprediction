@@ -26,15 +26,15 @@ MIN_INTENDED_WALKWAY_WITH = 0.2  # [m]
 MIN_OBS_SIZE = 0.2
 
 
-def write2File(filepath, mapdata):
-    file = open(filepath, 'w')
-    file.truncate(0)
-    file.write('World, EntropyRatio, MapSize, OccupancyRatio, NumObs_Cv2, AngleInfo_mean, distance_norm, distance_var, distance_avg\n')
-
-    for element in mapdata:
-        file.write(element)
-        file.write('\n')
-    file.close()
+# def write2File(filepath, mapdata):
+#     file = open(filepath, 'w')
+#     file.truncate(0)
+#     file.write('World, EntropyRatio, MapSize, OccupancyRatio, NumObs_Cv2, AngleInfo_mean, distance_norm, distance_var, distance_avg\n')
+#
+#     for element in mapdata:
+#         file.write(element)
+#         file.write('\n')
+#     file.close()
 
 
 class Complexity:
@@ -501,7 +501,6 @@ if __name__ == "__main__":
                 _,
                 data["distance.avg"],
             ) = Distance().image_feat(image_path, 0.3)
-
             # dump results
             Complexity().save_information(data, dest_path)
 
@@ -515,8 +514,8 @@ if __name__ == "__main__":
         #print(mapsdata)
 
         # write to file
-        csvPath = args.folders_path + '/map_worldcomplexity_results.csv'
-        write2File(csvPath, mapsdata)
+        # csvPath = args.folders_path + '/map_worldcomplexity_results.csv'
+        # write2File(csvPath, mapsdata)
 
     else:
 

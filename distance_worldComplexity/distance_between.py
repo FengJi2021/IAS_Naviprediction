@@ -70,9 +70,10 @@ class Distance:
         else:
             normDist = []
         if not var == None:
-            var = float("{0:.5f}".format(var))
+            var = float("{0:.9f}".format(var))
         else:
             var = []
+
         return normDist, var, minimum, average
 
     def find_boxes(self, cnts, width, image, tail):
